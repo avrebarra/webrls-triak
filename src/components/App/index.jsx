@@ -111,7 +111,9 @@ class App extends Component {
                 </div>
               </div>
               <div id="info">
-                Room {this.state.room} is last updated at 22.12.1998 and currently has {this.state.buddyList.length} users active in last 5 minutes.
+                { this.state.room !== '' &&
+                  <span> Room {this.state.room} has {this.state.buddyList.length} other active users.</span>
+                }
               </div>
             </div>
             <div id="content">

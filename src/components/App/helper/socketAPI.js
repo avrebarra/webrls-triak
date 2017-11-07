@@ -1,6 +1,7 @@
 import openSocket from 'socket.io-client';
+import config from '../../../config';
 
-const SOCKET_ADDR = '/';
+const SOCKET_ADDR = config.SOCKET_ADDR;
 const socket = openSocket(SOCKET_ADDR);
 
 // receivers
