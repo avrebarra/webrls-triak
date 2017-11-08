@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "google-map-react": "^0.25.0",
     "joi-browser": "^13.0.1",
     "lodash": "^4.17.4",
     "react": "^16.0.0",

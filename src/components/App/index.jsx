@@ -1,9 +1,17 @@
 // src\components\App\index.jsxs
 
 import React, {Component} from 'react';
+import GoogleMapReact from 'google-map-react';
+import config from '../../config';
+import _ from 'lodash';
+
+// Components needed
+import Marker from '../Marker';
+
+// Loads CSS and helpers
 import './index.css';
 import socketapi from './helper/socketAPI';
-import _ from 'lodash';
+import mapHelper from './helper/mapHelper';
 
 class App extends Component {
     constructor(props) {
@@ -11,6 +19,8 @@ class App extends Component {
       this.state = {
         username: '',
         room: '',
+        mapZoom : config.map.defaultZoom,
+        initialLocation: null,
         lastLocation: null,
         buddyList : []
       };
@@ -58,7 +68,9 @@ class App extends Component {
       let coordinate = {latitude: location.coords.latitude, longitude: location.coords.longitude};
       let room = this.state.room;
 
+      if(this.state.initialLocation === null) this.setState({initialLocation:coordinate});
       this.setState({lastLocation:coordinate});
+      console.log(this.state.lastLocation);
       if(room) socketapi.updateUserData({coordinate});
     }
 
@@ -100,26 +112,41 @@ class App extends Component {
 
     render() {
         return (
-          <div>
+          <div className='app'>
             <div id="basic-data">
               <div id="inputs">
-                <div className="data-in" id="username">
-                  <input type="text" placeholder="Enter your username" onChange={this.handleUsernameChange}/>
-                </div>
-                <div className="data-in" id="room-name">
-                  <input type="text" placeholder="Enter room name" onChange={this.handleRoomChange}/>
-                </div>
-              </div>
-              <div id="info">
-                { this.state.room !== '' &&
-                  <span> Room {this.state.room} has {this.state.buddyList.length} other active users.</span>
-                }
+                <input type="text" placeholder="Enter your username" onChange={this.handleUsernameChange}/>
+                <input type="text" placeholder="Enter room name" onChange={this.handleRoomChange}/>
               </div>
             </div>
             <div id="content">
-              {this.state.buddyList.map(buddy =>
-                <div key={buddy.id}>USER: {buddy.userdata.username} ({buddy.userdata.coordinate ? buddy.userdata.coordinate.longitude : ''},{buddy.userdata.coordinate ? buddy.userdata.coordinate.latitude : ''})</div>
-              )}
+              {this.state.initialLocation !== null &&
+                <GoogleMapReact
+                  bootstrapURLKeys={{key: "AIzaSyCH5CWjO1KB3zVUxc3YG8DLYX0-EyiqPGE"}}
+                  defaultCenter={mapHelper.getShortCoordinateObject(this.state.initialLocation)}
+                  defaultZoom={this.state.mapZoom}
+                >
+                  {this.state.lastLocation !== null &&
+                    <Marker
+                      usertype='you'
+                      username={this.state.username}
+                      lat={this.state.lastLocation.latitude}
+                      lng={this.state.lastLocation.longitude}
+                      text={this.state.username ? 'You are here!': this.state.username}
+                    />
+                  }
+                  {this.state.buddyList.map(buddy =>
+                    <Marker
+                      key={buddy.id}
+                      usertype='others'
+                      username={buddy.userdata.username}
+                      lat={buddy.userdata.coordinate.latitude}
+                      lng={buddy.userdata.coordinate.longitude}
+                      text={this.state.username ? 'You are here!': this.state.username}
+                    />
+                  )}
+                </GoogleMapReact>
+              }
             </div>
           </div>
         );
@@ -127,3 +154,7 @@ class App extends Component {
 }
 
 export default App;
+
+// {this.state.buddyList.map(buddy =>
+//   <div key={buddy.id}>USER: {buddy.userdata.username} ({buddy.userdata.coordinate ? buddy.userdata.coordinate.longitude : ''},{buddy.userdata.coordinate ? buddy.userdata.coordinate.latitude : ''})</div>
+// )}
