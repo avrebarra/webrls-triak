@@ -18,7 +18,7 @@ const validatedConfig = joival.value;
 
 // Exporting config values
 const config = {
-    server: validatedConfig.SOCKET_SERVER
+    SOCKET_SERVER: validatedConfig.SOCKET_SERVER
 }
 
 module.exports = config;
